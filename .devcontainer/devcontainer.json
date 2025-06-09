@@ -1,0 +1,27 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/javascript-node
+{
+	"name": "Node.js",
+
+	"dockerComposeFile": "docker-compose.yml",
+	"service": "app",
+	"workspaceFolder": "/fancy-gatus",
+	"shutdownAction": "stopCompose",
+
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	"forwardPorts": [
+		5173
+	],
+
+	// Configure tool-specific properties.
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"svelte.svelte-vscode",
+				"dbaeumer.vscode-eslint",
+				"esbenp.prettier-vscode",
+				"eamodio.gitlens"
+			]
+		}
+	}
+}

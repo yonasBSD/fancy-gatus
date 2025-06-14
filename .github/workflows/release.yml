@@ -23,10 +23,18 @@ jobs:
           npm run build
       - name: Create output zip
         run: cd build; zip -r ../fancy-gatus-${{ github.ref_name }}.zip *
-      - name: Publish Release
+      - name: Build changelog
+        id: release
+        uses: mikepenz/release-changelog-builder-action@v5
+        with:
+          configuration: ".github/changelog-configuration.json"
+          failOnError: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Publish release
         uses: softprops/action-gh-release@v2
         with:
           name: Fancy Gatus ${{ github.ref_name }}
-          body_path: ${{ github.workspace }}/CHANGELOG.md
+          body: ${{ steps.release.outputs.changelog }}
           files: fancy-gatus-${{ github.ref_name }}.zip
           fail_on_unmatched_files: true

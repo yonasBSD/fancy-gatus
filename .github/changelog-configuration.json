@@ -1,0 +1,22 @@
+{
+  "categories": [
+    {
+      "title": "## 🚀 Features",
+      "labels": ["enhancement"]
+    },
+    {
+      "title": "## 🐛 Fixes",
+      "labels": ["bug"]
+    },
+    {
+      "title": "## ⤵️ Dependencies",
+      "labels": ["dependencies"]
+    },
+    {
+      "title": "## 💭 Uncategorized",
+      "labels": []
+    }
+  ],
+  "template": "#{{CHANGELOG}}",
+  "pr_template": "* #{{TITLE}} by @#{{AUTHOR}} in ##{{NUMBER}}"
+}

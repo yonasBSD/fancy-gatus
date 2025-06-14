@@ -1,0 +1,32 @@
+name: Publish release
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Release pushed tag
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+      - name: Clean install dependencies and build
+        run: |
+          npm ci
+          npm run build
+      - name: Create output zip
+        run: cd build; zip -r ../fancy-gatus-${{ github.ref_name }}.zip *
+      - name: Publish Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Fancy Gatus ${{ github.ref_name }}
+          body_path: ${{ github.workspace }}/CHANGELOG.md
+          files: fancy-gatus-${{ github.ref_name }}.zip
+          fail_on_unmatched_files: true

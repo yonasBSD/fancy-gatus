@@ -2,9 +2,16 @@
 
 Fancy Gatus is an alternative frontend for the monitoring tool [Gatus](https://github.com/TwiN/gatus). The goal is to provide a simplified and modern status page based on data from a Gatus instance, which only displays the most important information in a way that is understandable for end users.
 
-You can see it in action here: https://status.bluemedia.dev
+You can see it in action [here](https://status.bluemedia.dev) or check out the screenshots below:
 
-![Demo screenshot](docs/demo-screenshot.png)
+<details>
+<summary>Screenshots</summary>
+
+![](docs/demo-light.png)
+
+![](docs/demo-dark.png)
+
+</details>
 
 ## Configuration
 

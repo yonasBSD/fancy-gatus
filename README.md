@@ -13,6 +13,13 @@ You can see it in action [here](https://status.bluemedia.dev) or check out the s
 
 </details>
 
+## Deployment
+
+Fancy Gatus is intended to be delivered directly from a web server (e.g. Nginx). The installation is therefore simple.  
+Just download the latest ZIP file from the release page and unpack it into the web root of your server. If you want to make further adjustments to the frontend, you can also create the configuration file in the web root. Refer to the [Configuration](#configuration) section for more information.
+
+Make sure that the Gatus API endpoint `/api/v1/endpoints/statuses` is available relative to the frontend if you have not configured a different base URL. An example configuration for Nginx that makes this possible can be found [here](docs/example-nginx.conf).
+
 ## Configuration
 
 The frontend tries to retrieve a configuration file named `config.json` from the webroot during page load. If the configuration is loaded successfully, it will be used to adjust the frontend. The possible options are listed below.
@@ -32,13 +39,6 @@ The frontend tries to retrieve a configuration file named `config.json` from the
 | `notice.content`         | Content text of the notice card.                                                                                                                                                                                                                                         | `""`                    |
 | `notice.createdAt`       | Date and time the notice was created at. For example, use the format `yyyy-MM-dd hh:mm`                                                                                                                                                                                  | `""`                    |
 | `notice.updatedAt`       | Date and time the notice was last updated at. For example, use the format `yyyy-MM-dd hh:mm`                                                                                                                                                                             | `""`                    |
-
-## Deployment
-
-Fancy Gatus is intended to be delivered directly from a web server (e.g. Nginx). The installation is therefore simple.  
-Just download the latest ZIP file from the release page and unpack it into the web root of your server. If you want to make further adjustments to the frontend, you can also create the configuration file in the web root. Refer to the [Configuration](#configuration) section for more information.
-
-Make sure that the Gatus API endpoint `/api/v1/endpoints/statuses` is available relative to the frontend if you have not configured a different base URL. An example configuration for Nginx that makes this possible can be found [here](docs/example-nginx.conf).
 
 ### Customizing the logo
 

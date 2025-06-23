@@ -27,7 +27,7 @@ jobs:
         id: release
         uses: mikepenz/release-changelog-builder-action@v5
         with:
-          configuration: ".github/changelog-configuration.json"
+          configuration: '.github/changelog-configuration.json'
           failOnError: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

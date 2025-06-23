@@ -1,5 +1,6 @@
 <script lang="ts">
   import axios from 'axios'
+  import type { AxiosError } from 'axios'
   import { onMount } from 'svelte'
   import type { Config } from '$lib/types/config'
   import type { Status } from '$lib/types/api'
@@ -15,41 +16,42 @@
   let config: Config = $state({})
   let apiData: Status[] = $state([])
 
-  function getConfig() {
-    axios
-      .get('config.json', { baseURL: '/' })
-      .then((response) => {
-        config = response.data
-        // Set title if defined in config
-        if (config.title) {
-          document.title = config.title
-        }
-        getApiData()
-      })
-      .catch((error) => {
-        if (error.response.status === 404) {
-          console.warn('No config.json file found. Using default values.')
-          getApiData()
-        } else {
-          console.log('Error getting config: ' + error)
-        }
-      })
+  async function getConfig() {
+    try {
+      const response = await axios.get('config.json', { baseURL: '/' })
+
+      config = response.data
+      // Set title if defined in config
+      if (config.title) {
+        document.title = config.title
+      }
+    } catch (err) {
+      const error = err as AxiosError
+      if (error.response && error.response.status === 404) {
+        console.warn('No config.json file found. Using default values.')
+      }
+      console.log('Error getting config: ' + error)
+    }
   }
 
-  function getApiData() {
+  async function getApiData() {
     // Set base URL for API calls if defined in config
     if (config.gatusBaseUrl && axios.defaults.baseURL !== config.gatusBaseUrl) {
       axios.defaults.baseURL = config.gatusBaseUrl
     }
-    axios
-      .get('/api/v1/endpoints/statuses')
-      .then((response) => {
-        apiData = response.data
-        loading = false
-      })
-      .catch((error) => {
-        console.log(error)
-      })
+
+    try {
+      const response = await axios.get('/api/v1/endpoints/statuses')
+      apiData = response.data
+      loading = false
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  async function refresh() {
+    await getConfig()
+    await getApiData()
   }
 
   // Group statuses by their group name
@@ -93,13 +95,14 @@
 
   // Array of statuses where the last result has success = false
   let failedStatuses = $derived.by(() => {
-    return apiData.filter((status) => {
+    const filteredStatuses = groups.flatMap((item) => item.statuses)
+    return filteredStatuses.filter((status) => {
       return !status.results[status.results.length - 1].success
     })
   })
 
   onMount(() => {
-    getConfig()
+    refresh()
   })
 </script>
 
@@ -118,6 +121,6 @@
       expandByDefault={config.defaultExpandGroups}
     />
   {/each}
-  <RefreshSettings defaultRefreshInterval={config.defaultRefreshInterval} onRefresh={getConfig} />
+  <RefreshSettings defaultRefreshInterval={config.defaultRefreshInterval} onRefresh={refresh} />
   <Footer />
 {/if}

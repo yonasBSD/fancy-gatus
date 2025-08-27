@@ -6,6 +6,7 @@
   } = $props()
 
   let isFailed = $derived(!props.status.results[props.status.results.length - 1].success)
+  let limitedResults = $derived(props.status.results.slice(-25))
 </script>
 
 <li
@@ -19,7 +20,7 @@
   </p>
   <span class="hidden lg:flex grow"></span>
   <div class="h-full w-fit mr-8 flex flex-row justify-between items-center gap-1">
-    {#each props.status.results as result (result.timestamp)}
+    {#each limitedResults as result (result.timestamp)}
       <div class="h-fit w-fit lg:tooltip">
         <div class="tooltip-content hidden lg:flex flex-col items-center">
           <p>{new Date(result.timestamp).toLocaleString()}</p>

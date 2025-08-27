@@ -1,12 +1,16 @@
-export type Notice = {
-  type?: 'success' | 'warning' | 'error'
-  title: string
-  content: string
-  createdAt: string
-  updatedAt?: string
+export type Announcement = {
+  type: 'outage' | 'warning' | 'information' | 'operational' | 'none'
+  message: string
+  timestamp: string
 }
 
-export type Config = {
+export type GatusConfig = {
+  oidc: boolean
+  authenticated: boolean
+  announcements: Announcement[]
+}
+
+export type FrontendConfig = {
   title?: string
   gatusBaseUrl?: string
   hiddenGroups?: string[]
@@ -14,5 +18,4 @@ export type Config = {
   groupOrder?: string[]
   defaultExpandGroups?: boolean
   defaultRefreshInterval?: 10 | 30 | 60 | 120 | 300 | 600
-  notice?: Notice
 }

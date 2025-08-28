@@ -13,6 +13,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -24,17 +26,25 @@ jobs:
       - name: Create output zip
         run: cd build; zip -r ../fancy-gatus-${{ github.ref_name }}.zip *
       - name: Build changelog
-        id: release
+        id: changelog
         uses: mikepenz/release-changelog-builder-action@v5
         with:
           configuration: '.github/changelog-configuration.json'
           failOnError: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Get notice from NOTICE.md
+        id: notice
+        run: |
+          echo "content<<EOF" >> $GITHUB_OUTPUT
+          awk -v ver="${{ github.ref_name }}" '/^## / { if (p) { exit }; if ($2 == ver) { p=1; next } } p && NF' NOTICE.md >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
       - name: Publish release
         uses: softprops/action-gh-release@v2
         with:
           name: Fancy Gatus ${{ github.ref_name }}
-          body: ${{ steps.release.outputs.changelog }}
+          body: |
+            ${{ steps.notice.outputs.content }}
+            ${{ steps.changelog.outputs.changelog }}
           files: fancy-gatus-${{ github.ref_name }}.zip
           fail_on_unmatched_files: true

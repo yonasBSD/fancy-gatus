@@ -18,7 +18,7 @@ You can see it in action [here](https://status.bluemedia.dev) or check out the s
 Fancy Gatus is intended to be delivered directly from a web server (e.g. Nginx). The installation is therefore simple.  
 Just download the latest ZIP file from the release page and unpack it into the web root of your server. If you want to make further adjustments to the frontend, you can also create the configuration file in the web root. Refer to the [Configuration](#configuration) section for more information.
 
-Make sure that the Gatus API endpoint `/api/v1/endpoints/statuses` is available relative to the frontend if you have not configured a different base URL. An example configuration for Nginx that makes this possible can be found [here](docs/example-nginx.conf).
+Make sure that the Gatus API endpoints `/api/v1/endpoints/statuses` and `/api/v1/config` are available relative to the frontend if you have not configured a different base URL. An example configuration for Nginx that makes this possible can be found [here](docs/example-nginx.conf).
 
 ## Configuration
 
@@ -33,12 +33,6 @@ The frontend tries to retrieve a configuration file named `config.json` from the
 | `groupOrder`             | Array containing names of groups. The groups are sorted in the frontend according to the order in the array (different from alphabetical sorting by default). If groups are not included in the array, they will be added alphabetically sorted below the sorted groups. | `[]`                    |
 | `defaultExpandGroups`    | Boolean specifying if groups should be expanded by default.                                                                                                                                                                                                              | `false`                 |
 | `defaultRefreshInterval` | Interval in seconds after which the API data and config is refreshed in the background by default. Can be changed by the user by selecting a value in the lower left corner of the page. Possible values: `10`, `30`, `60`, `120`, `300`, `600`                          | `60`                    |
-| `notice`                 | Optional configuration for a notice on the page. It can be used to provide further information about a current outage, for example.                                                                                                                                      | `{}`                    |
-| `notice.type`            | Type of the notice. This determines the background color of the card. Possible values: `success`, `warning`, `error`, not defined (same color as other cards)                                                                                                            | not defined             |
-| `notice.title`           | Title of the notice card.                                                                                                                                                                                                                                                | `""`                    |
-| `notice.content`         | Content text of the notice card.                                                                                                                                                                                                                                         | `""`                    |
-| `notice.createdAt`       | Date and time the notice was created at. For example, use the format `yyyy-MM-dd hh:mm`                                                                                                                                                                                  | `""`                    |
-| `notice.updatedAt`       | Date and time the notice was last updated at. For example, use the format `yyyy-MM-dd hh:mm`                                                                                                                                                                             | `""`                    |
 
 ### Customizing the logo
 

@@ -2,28 +2,30 @@
   import axios from 'axios'
   import type { AxiosError } from 'axios'
   import { onMount } from 'svelte'
-  import type { Config } from '$lib/types/config'
+  import type { FrontendConfig, GatusConfig } from '$lib/types/config'
   import type { Status } from '$lib/types/api'
   import Loader from '$lib/components/Loader.svelte'
   import Header from '$lib/components/Header.svelte'
-  import Notice from '$lib/components/Notice.svelte'
+  import Announcements from '$lib/components/Announcements.svelte'
   import OverallStatus from '$lib/components/OverallStatus.svelte'
   import EndpointGroup from '$lib/components/StatusGroup.svelte'
   import RefreshSettings from '$lib/components/RefreshSettings.svelte'
   import Footer from '$lib/components/Footer.svelte'
+  import { SvelteMap } from 'svelte/reactivity'
 
   let loading = $state(true)
-  let config: Config = $state({})
-  let apiData: Status[] = $state([])
+  let frontendConfig: FrontendConfig = $state({})
+  let statuses: Status[] = $state([])
+  let gatusConfig: GatusConfig = $state({ oidc: false, authenticated: false, announcements: [] })
 
-  async function getConfig() {
+  async function getFrontendConfig() {
     try {
       const response = await axios.get('config.json', { baseURL: '/' })
 
-      config = response.data
+      frontendConfig = response.data
       // Set title if defined in config
-      if (config.title) {
-        document.title = config.title
+      if (frontendConfig.title) {
+        document.title = frontendConfig.title
       }
     } catch (err) {
       const error = err as AxiosError
@@ -36,13 +38,17 @@
 
   async function getApiData() {
     // Set base URL for API calls if defined in config
-    if (config.gatusBaseUrl && axios.defaults.baseURL !== config.gatusBaseUrl) {
-      axios.defaults.baseURL = config.gatusBaseUrl
+    if (frontendConfig.gatusBaseUrl && axios.defaults.baseURL !== frontendConfig.gatusBaseUrl) {
+      axios.defaults.baseURL = frontendConfig.gatusBaseUrl
     }
 
     try {
-      const response = await axios.get('/api/v1/endpoints/statuses')
-      apiData = response.data
+      const statusesResponse = await axios.get('/api/v1/endpoints/statuses')
+      statuses = statusesResponse.data
+
+      const gatusConfigResponse = await axios.get('/api/v1/config')
+      gatusConfig = gatusConfigResponse.data
+
       loading = false
     } catch (error) {
       console.log(error)
@@ -50,23 +56,27 @@
   }
 
   async function refresh() {
-    await getConfig()
     await getApiData()
+  }
+
+  async function startup() {
+    await getFrontendConfig()
+    await refresh()
   }
 
   // Group statuses by their group name
   // and sort them according to the config if specified
   let groups: { title: string; statuses: Status[] }[] = $derived.by(() => {
     // Group statuses by group name
-    let groups: Map<string, Status[]> = new Map<string, Status[]>()
-    apiData.map((status) => {
+    let groups: SvelteMap<string, Status[]> = new SvelteMap<string, Status[]>()
+    statuses.map((status) => {
       // Filter statuses that should be hidden
-      if (config.hiddenStatuses?.includes(status.name)) return
+      if (frontendConfig.hiddenStatuses?.includes(status.name)) return
       if (!status.group) {
         status.group = 'Ungrouped'
       }
       // Filter groups that should be hidden
-      if (config.hiddenGroups?.includes(status.group)) return
+      if (frontendConfig.hiddenGroups?.includes(status.group)) return
       let groupStatuses = groups.get(status.group) || []
       groupStatuses.push(status)
       groups.set(status.group, groupStatuses)
@@ -75,8 +85,8 @@
     // Sort by config
     let tmp = groups
     let sortedGroups: { title: string; statuses: Status[] }[] = []
-    if (config.groupOrder) {
-      config.groupOrder.forEach((key) => {
+    if (frontendConfig.groupOrder) {
+      frontendConfig.groupOrder.forEach((key) => {
         if (tmp.has(key)) {
           sortedGroups.push({ title: key, statuses: tmp.get(key)! })
           tmp.delete(key)
@@ -102,25 +112,28 @@
   })
 
   onMount(() => {
-    refresh()
+    startup()
   })
 </script>
 
 {#if loading}
   <Loader />
 {:else}
-  <Header title={config.title} />
-  {#if config.notice}
-    <Notice notice={config.notice} />
+  <Header title={frontendConfig.title} />
+  {#if gatusConfig.announcements.length > 0}
+    <Announcements announcements={gatusConfig.announcements} />
   {/if}
   <OverallStatus {failedStatuses} />
   {#each groups as group (group.title)}
     <EndpointGroup
       title={group.title}
       statuses={group.statuses}
-      expandByDefault={config.defaultExpandGroups}
+      expandByDefault={frontendConfig.defaultExpandGroups}
     />
   {/each}
-  <RefreshSettings defaultRefreshInterval={config.defaultRefreshInterval} onRefresh={refresh} />
+  <RefreshSettings
+    defaultRefreshInterval={frontendConfig.defaultRefreshInterval}
+    onRefresh={refresh}
+  />
   <Footer />
 {/if}

@@ -37,7 +37,7 @@ jobs:
         id: notice
         run: |
           echo "content<<EOF" >> $GITHUB_OUTPUT
-          awk -v ver="${{ github.ref_name }}" '/^## / { if (p) { exit }; if ($2 == ver) { p=1; next } } p && NF' NOTICE.md >> $GITHUB_OUTPUT
+          awk -v ver="${{ github.ref_name }}" '/^## / { if (p) { exit }; if ($2 == ver) { p=1; next } } p' NOTICE.md >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
       - name: Publish release
         uses: softprops/action-gh-release@v2
